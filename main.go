@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
@@ -16,6 +17,22 @@ func RaiseBadRequest(c *gin.Context, message string, err error) {
 	fmt.Println(err)
 	c.JSON(http.StatusBadRequest, gin.H{"error": message})
 	return
+}
+
+func buildNestedMap(key string, value interface{}) map[string]interface{} {
+	keys := strings.Split(key, ".")
+	m := make(map[string]interface{})
+	current := m
+	for i, k := range keys {
+		if i == len(keys)-1 {
+			current[k] = value
+		} else {
+			nested := make(map[string]interface{})
+			current[k] = nested
+			current = nested
+		}
+	}
+	return m
 }
 
 func uploadCSV(config Config, rule Rule) gin.HandlerFunc {
@@ -73,12 +90,19 @@ func uploadCSV(config Config, rule Rule) gin.HandlerFunc {
 			processedRows++
 		}
 
+		var response interface{}
+		if rule.Http.PayloadKey != "" {
+			response = buildNestedMap(rule.Http.PayloadKey, payloads)
+		} else {
+			response = payloads
+		}
+
 		// start http stuff
 		if dry {
-			c.JSON(http.StatusOK, payloads)
+			c.JSON(http.StatusOK, response)
 			return
 		}
-		if err := SendPayload(rule, payloads); err != nil {
+		if err := SendPayload(rule, response); err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("HTTP Failed: %v", err)})
 			return
 		}
@@ -110,5 +134,6 @@ func main() {
 		authGroup.POST(rule.ID, uploadCSV(config, rule))
 	}
 
+	log.Println("Datenkarte Started.")
 	r.Run()
 }

@@ -8,7 +8,7 @@ import (
 	"net/http"
 )
 
-func SendPayload(rule Rule, payload []map[string]interface{}) error {
+func SendPayload(rule Rule, payload interface{}) error {
 	if rule.Http == nil {
 		return fmt.Errorf("no HTTP configuration provided in rule")
 	}

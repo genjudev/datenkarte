@@ -85,52 +85,7 @@ curl -X POST -F "file=@data.csv" "http://localhost:8080/dk/upload/string-for-url
 
 ### YAML Configuration
 
-```yaml
-Rules:
-  - id: "string-for-url"
-    type: http
-    http:
-      url: "https://example.tld/api/user"
-      method: POST
-      headers:
-        - name: "content-type"
-          value: "application/json"
-        - name: "X-CLIENT-ID"
-          value: ""
-        - name: "X-API-TOKEN"
-          value: ""
-      auth:
-        type: bearer
-        value: token
-      payload_key: "data"
-    each_line:
-      - map:
-          - name: "Last name"
-            to: "lastName"
-          - name: "First name"
-            to: "firstName"
-          - name: "employeeId"
-            fill:
-              type: "string"
-              prefix: "changeme-"
-              value: "row_number"
-          - name: "groups"
-            fill:
-              type: "array"
-              value:
-                - "user"
-                - "company default group"
-          - name: "Location"
-            insert_into: "groups"
-        validation:
-          - field: "Last name"
-            type: "string"
-          - field: "First name"
-            type: "string"
-        handlers:
-          - "my_handler"
-          - "my_other_one"
-```
+see config.example.yaml
 
 ---
 

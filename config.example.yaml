@@ -1,26 +1,17 @@
-Auth:
-  headers:
-    - name: X-CLIENT-ID
-      match: client-id
-    - name: X-API-TOKEN
-      match: token
-
 Rules:
   - id: "string-for-url"
     type: http
     http:
-      url: "https://example.tld/api/user"
+      url: "http://localhost:3000/api/test"
       method: POST
       headers:
         - name: "content-type"
-          value: "application/json"
-        - name: "X-CLIENT-ID"
           value: ""
-        - name: "X-API-TOKEN"
-          value: ""
+        - name: "mykey"
+          value: "myvalue"
       auth:
         type: bearer
-        value: token
+        value: CHANGEME
       payload_key: "data"
     each_line:
       - map:
@@ -28,7 +19,7 @@ Rules:
             to: "lastName"
           - name: "First name"
             to: "firstName"
-          - name: "employeeId"
+          - name: "id"
             fill:
               type: "string"
               prefix: "changeme-"

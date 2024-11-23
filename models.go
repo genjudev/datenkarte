@@ -27,6 +27,7 @@ type AuthConfig struct {
 type Mapping struct {
 	Name       string `yaml:"name"`
 	To         string `yaml:"to"`
+	Required   bool   `yaml:"required"`
 	Nested     string `yaml:"nested"`
 	Fill       *Fill  `yaml:"fill"`
 	InsertInto string `yaml:"insert_into"`
@@ -65,10 +66,11 @@ type HttpType struct {
 
 // Rule defines the processing rules for an endpoint
 type Rule struct {
-	ID       string     `yaml:"id"`
-	Type     string     `yaml:"type"`
-	Http     *HttpType  `yaml:"http"`
-	EachLine []EachLine `yaml:"each_line"`
+	ID        string     `yaml:"id"`
+	Delimiter string     `yaml:"delimiter"`
+	Type      string     `yaml:"type"`
+	Http      *HttpType  `yaml:"http"`
+	EachLine  []EachLine `yaml:"each_line"`
 }
 
 // Config represents the entire YAML configuration

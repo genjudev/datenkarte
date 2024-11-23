@@ -1,5 +1,6 @@
 Rules:
   - id: "string-for-url"
+    delimiter: ";"
     type: http
     http:
       url: "http://localhost:3000/api/test"
@@ -17,6 +18,7 @@ Rules:
       - map:
           - name: "Last name"
             to: "lastName"
+            required: true
           - name: "First name"
             to: "firstName"
           - name: "id"

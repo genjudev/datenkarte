@@ -5,6 +5,15 @@ import (
 	"strings"
 )
 
+func stringInSlice(search string, list []string) bool {
+	for _, item := range list {
+		if search == item {
+			return true
+		}
+	}
+	return false
+}
+
 func MapLineToJSON(line []string, headers []string, rule Rule, index int) (map[string]interface{}, error) {
 	mapped := make(map[string]interface{})
 	for _, mapping := range rule.EachLine[0].Map {
@@ -12,6 +21,14 @@ func MapLineToJSON(line []string, headers []string, rule Rule, index int) (map[s
 		targetKey := mapping.To
 		if targetKey == "" {
 			targetKey = mapping.Name
+		}
+
+		if mapping.Required {
+			ok := stringInSlice(mapping.Name, headers)
+			if !ok {
+				return nil, fmt.Errorf("required header not found: %s", mapping.Name)
+			}
+
 		}
 
 		var value interface{}

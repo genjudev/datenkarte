@@ -62,8 +62,16 @@ func uploadCSV(config Config, rule Rule) gin.HandlerFunc {
 		}
 		defer fileOpen.Close()
 
+		delimiter := rule.Delimiter
+
+		if delimiter == "" {
+			delimiter = ";"
+		}
+
+		fmt.Printf("%v\n", delimiter)
+
 		reader := csv.NewReader(fileOpen)
-		reader.Comma = ';'
+		reader.Comma = rune(delimiter[0])
 		records, err := reader.ReadAll()
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "Failed to parse CSV file"})
@@ -82,7 +90,7 @@ func uploadCSV(config Config, rule Rule) gin.HandlerFunc {
 
 			jsonPayload, err := MapLineToJSON(line, headers, rule, i)
 			if err != nil {
-				c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("Mapping failed: %v", err)})
+				c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("Mapping failed: %v", err)})
 				return
 			}
 

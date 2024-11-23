@@ -1,0 +1,52 @@
+Auth:
+  headers:
+    - name: X-CLIENT-ID
+      match: client-id
+    - name: X-API-TOKEN
+      match: token
+
+Rules:
+  - id: "string-for-url"
+    type: http
+    http:
+      url: "https://example.tld/api/user"
+      method: POST
+      headers:
+        - name: "content-type"
+          value: "application/json"
+        - name: "X-CLIENT-ID"
+          value: ""
+        - name: "X-API-TOKEN"
+          value: ""
+      auth:
+        type: bearer
+        value: token
+      payload_key: "data"
+    each_line:
+      - map:
+          - name: "Last name"
+            to: "lastName"
+          - name: "First name"
+            to: "firstName"
+          - name: "employeeId"
+            fill:
+              type: "string"
+              prefix: "changeme-"
+              value: "row_number"
+          - name: "groups"
+            fill:
+              type: "array"
+              value:
+                - "user"
+                - "company default group"
+          - name: "Location"
+            insert_into: "groups"
+        validation:
+          - field: "Last name"
+            type: "string"
+          - field: "First name"
+            type: "string"
+        handlers:
+          - "my_handler"
+          - "my_other_one"
+

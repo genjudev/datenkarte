@@ -27,3 +27,6 @@ go.work.sum
 
 mongo_data/
 config.yaml
+
+# air
+tmp/

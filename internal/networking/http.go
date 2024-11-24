@@ -1,14 +1,15 @@
-package main
+package networking
 
 import (
 	"bytes"
+	"datenkarte/internal/models"
 	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
 )
 
-func SendPayload(rule Rule, payload interface{}) error {
+func SendPayload(rule models.Rule, payload interface{}) error {
 	if rule.Http == nil {
 		return fmt.Errorf("no HTTP configuration provided in rule")
 	}

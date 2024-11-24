@@ -1,6 +1,7 @@
-package main
+package mapping
 
 import (
+	"datenkarte/internal/models"
 	"fmt"
 	"strings"
 )
@@ -14,7 +15,7 @@ func stringInSlice(search string, list []string) bool {
 	return false
 }
 
-func MapLineToJSON(line []string, headers []string, rule Rule, index int) (map[string]interface{}, error) {
+func MapLineToJSON(line []string, headers []string, rule models.Rule, index int) (map[string]interface{}, error) {
 	mapped := make(map[string]interface{})
 	for _, mapping := range rule.EachLine[0].Map {
 		found := false

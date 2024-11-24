@@ -1,4 +1,4 @@
-package main
+package models
 
 // AuthHeader defines a single authentication header
 type AuthHeader struct {

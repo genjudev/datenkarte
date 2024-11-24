@@ -1,6 +1,7 @@
-package main
+package validation
 
 import (
+	"datenkarte/internal/models"
 	"fmt"
 	"regexp"
 	"strconv"
@@ -9,7 +10,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func ValidateLine(c *gin.Context, line []string, headers []string, rule Rule) error {
+func ValidateLine(c *gin.Context, line []string, headers []string, rule models.Rule) error {
 	for _, validation := range rule.EachLine[0].Validation {
 		for i, header := range headers {
 			if validation.Field == header {

@@ -1,6 +1,11 @@
 package main
 
 import (
+	"datenkarte/internal/mapping"
+	"datenkarte/internal/middlewares"
+	"datenkarte/internal/models"
+	"datenkarte/internal/networking"
+	"datenkarte/internal/validation"
 	"encoding/csv"
 	"fmt"
 	"log"
@@ -35,7 +40,7 @@ func buildNestedMap(key string, value interface{}) map[string]interface{} {
 	return m
 }
 
-func uploadCSV(config Config, rule Rule) gin.HandlerFunc {
+func uploadCSV(config models.Config, rule models.Rule) gin.HandlerFunc {
 	return func(c *gin.Context) {
 
 		queries := c.Request.URL.Query()
@@ -83,12 +88,12 @@ func uploadCSV(config Config, rule Rule) gin.HandlerFunc {
 		headers := records[0]
 		processedRows := 0
 		for i, line := range records[1:] {
-			if err := ValidateLine(c, line, headers, rule); err != nil {
+			if err := validation.ValidateLine(c, line, headers, rule); err != nil {
 				c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("Validation failed: %v", err)})
 				return
 			}
 
-			jsonPayload, err := MapLineToJSON(line, headers, rule, i)
+			jsonPayload, err := mapping.MapLineToJSON(line, headers, rule, i)
 			if err != nil {
 				c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("Mapping failed: %v", err)})
 				return
@@ -110,7 +115,7 @@ func uploadCSV(config Config, rule Rule) gin.HandlerFunc {
 			c.JSON(http.StatusOK, response)
 			return
 		}
-		if err := SendPayload(rule, response); err != nil {
+		if err := networking.SendPayload(rule, response); err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("HTTP Failed: %v", err)})
 			return
 		}
@@ -127,7 +132,7 @@ func main() {
 	}
 	defer file.Close()
 
-	var config Config
+	var config models.Config
 	decoder := yaml.NewDecoder(file)
 	if err := decoder.Decode(&config); err != nil {
 		log.Fatalf("Failed to decode YAML: %v", err)
@@ -136,7 +141,7 @@ func main() {
 	r := gin.Default()
 
 	authGroup := r.Group("/dk/upload")
-	authGroup.Use(AuthenticationMiddleware())
+	authGroup.Use(middlewares.AuthenticationMiddleware())
 
 	for _, rule := range config.Rules {
 		authGroup.POST(rule.ID, uploadCSV(config, rule))

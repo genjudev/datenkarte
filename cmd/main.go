@@ -138,6 +138,9 @@ func main() {
 
     // starting persistent handlers
     for _, handler := range config.Handlers {
+        if !handler.Persistent {
+            continue
+        }
         if _, err := handlers.NewProcess(handler.Name); err != nil {
             log.Fatalf("%v", err)
         }

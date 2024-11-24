@@ -54,7 +54,7 @@ When using the `?dry=true` query parameter, Datenkarte processes the CSV and gen
 #### Request:
 
 ```bash
-curl -X POST -F "file=@data.csv" "http://localhost:8080/dk/upload/string-for-url?dry=true"
+curl -X POST -F "file=@example.csv" -H "Authorization: Bearer token" "http://localhost:8080/dk/upload/string-for-url?dry=true"
 ```
 
 #### Response:
@@ -146,7 +146,7 @@ POST /dk/upload/{ruleID}?dry=true
 - **Example**:
 
   ```bash
-  curl -X POST -F "file=@data.csv" http://localhost:8080/dk/upload/string-for-url
+    curl -X POST -F "file=@example.csv" -H "Authorization: Bearer token" "http://localhost:8080/dk/upload/string-for-url
   ```
 
 - **Response (Standard Run)**:

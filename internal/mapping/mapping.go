@@ -62,16 +62,11 @@ func MapLineToJSON(line []string, headers []string, rule models.Rule, index int)
 				}
 			}
 			for _, handler := range mapping.Handlers {
-				p, err := handlers.GetProcess(handler)
+				response, err := handlers.SendCommand(handler, value)
 				if err != nil {
 					log.Printf("%v\n", err)
 					continue
 				}
-                response, err := p.Exec(value)
-                if err != nil {
-                    log.Printf("%v\n", err)
-                    continue
-                }
                 mapped[targetKey] = response
 			}
 		}

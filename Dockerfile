@@ -14,7 +14,7 @@ RUN go mod download
 COPY . .
 
 # Build the Go application
-RUN GIN_MODE=release go build -o datenkarte .
+RUN GIN_MODE=release go build -o datenkarte cmd/main.go
 
 # Expose the port the app runs on
 EXPOSE 8080

@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Datenkarte is a self-hosted software solution for transforming CSV data into structured JSON payloads and integrating with APIs.">
+    <title>Datenkarte</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            background-color: #121212; /* Dark background */
+            color: #d4edda; /* Neo dark green text */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container {
+            background-color: #1e272e; /* Slightly lighter dark background */
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.6); /* Subtle shadow */
+            width: 90%;
+            max-width: 500px;
+        }
+
+        .command {
+            font-size: 1.2em;
+            background-color: #0b3d3d; /* Neo dark green background */
+            color: #d4edda;
+            padding: 10px 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            display: inline-block;
+            font-family: monospace;
+            user-select: all; /* Allows users to easily copy */
+        }
+
+        .link {
+            color: #4caf50; /* Bright green for links */
+            text-decoration: none;
+            font-weight: bold;
+            display: inline-block;
+            margin-top: 15px;
+        }
+
+        .link:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Datenkarte</h1>
+        <p>Datenkarte is a self-hosted software solution for transforming CSV data into structured JSON payloads and integrating with APIs. It offers dynamic data mapping, validation, and enrichment features.</p>
+        <div class="command">docker pull genjudev/datenkarte</div>
+        <a class="link" href="https://github.com/genjudev/datenkarte" target="_blank">View Documentation on GitHub</a>
+    </div>
+</body>
+</html>
+

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"datenkarte/internal/handlers"
 	"datenkarte/internal/mapping"
 	"datenkarte/internal/middlewares"
 	"datenkarte/internal/models"
@@ -40,7 +41,7 @@ func buildNestedMap(key string, value interface{}) map[string]interface{} {
 	return m
 }
 
-func uploadCSV(config models.Config, rule models.Rule) gin.HandlerFunc {
+func uploadCSV(rule models.Rule) gin.HandlerFunc {
 	return func(c *gin.Context) {
 
 		queries := c.Request.URL.Query()
@@ -51,14 +52,11 @@ func uploadCSV(config models.Config, rule models.Rule) gin.HandlerFunc {
 
 		file, err := c.FormFile("file")
 		if err != nil {
+            log.Printf("%v", err)
 			c.JSON(http.StatusBadRequest, gin.H{"error": "could not receive file."})
 			return
 		}
 
-		if file.Header.Get("content-type") != "text/csv" {
-			c.JSON(http.StatusBadRequest, gin.H{"error": "content-type not allowed."})
-			return
-		}
 
 		fileOpen, err := file.Open()
 		if err != nil {
@@ -138,13 +136,20 @@ func main() {
 		log.Fatalf("Failed to decode YAML: %v", err)
 	}
 
+    // starting persistent handlers
+    for _, handler := range config.Handlers {
+        if _, err := handlers.NewProcess(handler.Name); err != nil {
+            log.Fatalf("%v", err)
+        }
+    }
+
 	r := gin.Default()
 
 	authGroup := r.Group("/dk/upload")
 	authGroup.Use(middlewares.AuthenticationMiddleware())
 
 	for _, rule := range config.Rules {
-		authGroup.POST(rule.ID, uploadCSV(config, rule))
+		authGroup.POST(rule.ID, uploadCSV(rule))
 	}
 
 	log.Println("Datenkarte Started.")

@@ -1,5 +1,7 @@
 package models
 
+import "datenkarte/internal/handlers"
+
 // AuthHeader defines a single authentication header
 type AuthHeader struct {
 	Name  string `yaml:"name"`
@@ -25,12 +27,13 @@ type AuthConfig struct {
 
 // Mapping defines the JSON mapping for a specific field
 type Mapping struct {
-	Name       string `yaml:"name"`
-	To         string `yaml:"to"`
-	Required   bool   `yaml:"required"`
-	Nested     string `yaml:"nested"`
-	Fill       *Fill  `yaml:"fill"`
-	InsertInto string `yaml:"insert_into"`
+	Name       string   `yaml:"name"`
+	To         string   `yaml:"to"`
+	Required   bool     `yaml:"required"`
+	Nested     string   `yaml:"nested"`
+	Fill       *Fill    `yaml:"fill"`
+	InsertInto string   `yaml:"insert_into"`
+	Handlers   []string `yaml:"handlers"`
 }
 type Fill struct {
 	Type   string      `yaml:"type"`
@@ -48,7 +51,6 @@ type Validation struct {
 type EachLine struct {
 	Map        []Mapping    `yaml:"map"`
 	Validation []Validation `yaml:"validation"`
-	Handlers   []string     `yaml:"handlers"`
 }
 
 type HttpAuth struct {
@@ -75,6 +77,7 @@ type Rule struct {
 
 // Config represents the entire YAML configuration
 type Config struct {
-	Auth  Auth   `yaml:"Auth"`
-	Rules []Rule `yaml:"Rules"`
+	Auth     Auth               `yaml:"Auth"`
+	Rules    []Rule             `yaml:"Rules"`
+	Handlers []handlers.Handler `yaml:"Handlers"`
 }

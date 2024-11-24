@@ -1,8 +1,10 @@
 package mapping
 
 import (
+	"datenkarte/internal/handlers"
 	"datenkarte/internal/models"
 	"fmt"
+    "log"
 	"strings"
 )
 
@@ -58,6 +60,19 @@ func MapLineToJSON(line []string, headers []string, rule models.Rule, index int)
 				if mapping.InsertInto == "" {
 					mapped[targetKey] = value
 				}
+			}
+			for _, handler := range mapping.Handlers {
+				p, err := handlers.GetProcess(handler)
+				if err != nil {
+					log.Printf("%v\n", err)
+					continue
+				}
+                response, err := p.Exec(value)
+                if err != nil {
+                    log.Printf("%v\n", err)
+                    continue
+                }
+                mapped[targetKey] = response
 			}
 		}
 		if !found && mapping.Fill != nil {

@@ -34,12 +34,14 @@ Rules:
                 - "company default group"
           - name: "Location"
             insert_into: "groups"
+          - name: "Password"
+            handlers:
+              - "hasher"
         validation:
           - field: "Last name"
             type: "string"
           - field: "First name"
             type: "string"
-        handlers:
-          - "my_handler"
-          - "my_other_one"
-
+Handlers:
+  - name: "hasher"
+    persistent: true

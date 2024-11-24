@@ -66,13 +66,13 @@ curl -X POST -F "file=@data.csv" "http://localhost:8080/dk/upload/string-for-url
     {
       "lastName": "Doe",
       "firstName": "John",
-      "employeeId": "changeme-1",
+      "id": "changeme-1",
       "groups": ["user", "company default group", "New York"]
     },
     {
       "lastName": "Smith",
       "firstName": "Jane",
-      "employeeId": "changeme-2",
+      "id": "changeme-2",
       "groups": ["user", "company default group", "California"]
     }
   ]
@@ -113,7 +113,7 @@ Smith,Jane,California
 {
   "lastName": "Doe",
   "firstName": "John",
-  "employeeId": "changeme-1",
+  "id": "changeme-1",
   "groups": ["user", "company default group", "New York"]
 }
 ```
@@ -124,7 +124,7 @@ Smith,Jane,California
 {
   "lastName": "Smith",
   "firstName": "Jane",
-  "employeeId": "changeme-2",
+  "id": "changeme-2",
   "groups": ["user", "company default group", "California"]
 }
 ```
@@ -165,13 +165,13 @@ POST /dk/upload/{ruleID}?dry=true
   {
     "lastName": "Doe",
     "firstName": "John",
-    "employeeId": "changeme-1",
+    "id": "changeme-1",
     "groups": ["user", "company default group", "New York"]
   },
   {
     "lastName": "Smith",
     "firstName": "Jane",
-    "employeeId": "changeme-2",
+    "id": "changeme-2",
     "groups": ["user", "company default group", "California"]
   }
 ]

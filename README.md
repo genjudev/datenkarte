@@ -51,6 +51,36 @@ Datenkarte is a self-hosted software solution for transforming CSV data into str
 
 ---
 
+## **Plugins**
+
+Plugins extend Datenkarte's functionality through Go plugins that hook into different stages of the processing lifecycle. Plugins are compiled as shared objects (`.so` files) and loaded dynamically at runtime.
+
+### **Plugin Lifecycle Hooks**
+
+- **ENTER_RULE**: Executed when processing of a rule begins
+- **ENTER_LINE**: Executed before processing each CSV line
+- **EXIT_LINE**: Executed after processing each CSV line
+- **EXIT_RULE**: Executed when rule processing completes
+
+### **Creating a Plugin**
+
+1. Create a new Go file implementing the Plugin interface:
+
+```go
+package main
+
+import (
+	"github.com/your-repo/datenkarte"
+)
+
+func main() {
+	plugin := &datenkarte.Plugin{}
+	datenkarte.RegisterPlugin(plugin)
+}
+```
+
+---
+
 ## **Handlers**
 
 Handlers allow you to process fields with custom logic using external scripts or binaries. This feature is ideal for tasks like hashing passwords, data normalization, or any advanced processing that goes beyond standard mapping and validation.

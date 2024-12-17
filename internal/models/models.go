@@ -34,6 +34,7 @@ type Mapping struct {
 	Fill       *Fill    `yaml:"fill"`
 	InsertInto string   `yaml:"insert_into"`
 	Handlers   []string `yaml:"handlers"`
+	Plugins    []string `yaml:"plugins"`
 }
 type Fill struct {
 	Type   string      `yaml:"type"`
@@ -79,5 +80,6 @@ type Rule struct {
 type Config struct {
 	Auth     Auth               `yaml:"Auth"`
 	Rules    []Rule             `yaml:"Rules"`
+	Plugins  []string           `yaml:"Plugins"`
 	Handlers []handlers.Handler `yaml:"Handlers"`
 }

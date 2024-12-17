@@ -6,6 +6,7 @@ import (
 	"datenkarte/internal/middlewares"
 	"datenkarte/internal/models"
 	"datenkarte/internal/networking"
+	"datenkarte/internal/plugins"
 	"datenkarte/internal/validation"
 	"encoding/csv"
 	"fmt"
@@ -41,8 +42,18 @@ func buildNestedMap(key string, value interface{}) map[string]interface{} {
 	return m
 }
 
-func uploadCSV(rule models.Rule) gin.HandlerFunc {
+func uploadCSV(rule models.Rule, pm *plugins.PluginManager) gin.HandlerFunc {
 	return func(c *gin.Context) {
+		// Execute ENTER_RULE hook
+		ruleData := map[string]interface{}{
+			"rule_id": rule.ID,
+			"type":    rule.Type,
+		}
+
+		if _, err := pm.ExecuteHook(plugins.ENTER_RULE, ruleData); err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("Plugin execution failed: %v", err)})
+			return
+		}
 
 		queries := c.Request.URL.Query()
 		dry := false
@@ -52,11 +63,10 @@ func uploadCSV(rule models.Rule) gin.HandlerFunc {
 
 		file, err := c.FormFile("file")
 		if err != nil {
-            log.Printf("%v", err)
+			log.Printf("%v", err)
 			c.JSON(http.StatusBadRequest, gin.H{"error": "could not receive file."})
 			return
 		}
-
 
 		fileOpen, err := file.Open()
 		if err != nil {
@@ -71,12 +81,11 @@ func uploadCSV(rule models.Rule) gin.HandlerFunc {
 			delimiter = ";"
 		}
 
-		fmt.Printf("%v\n", delimiter)
-
 		reader := csv.NewReader(fileOpen)
-		reader.Comma = rune(delimiter[0])
+		reader.Comma = []rune(delimiter)[0]
 		records, err := reader.ReadAll()
 		if err != nil {
+			log.Printf("%v", err)
 			c.JSON(http.StatusBadRequest, gin.H{"error": "Failed to parse CSV file"})
 			return
 		}
@@ -91,7 +100,7 @@ func uploadCSV(rule models.Rule) gin.HandlerFunc {
 				return
 			}
 
-			jsonPayload, err := mapping.MapLineToJSON(line, headers, rule, i)
+			jsonPayload, err := mapping.MapLineToJSON(line, headers, rule, i, pm)
 			if err != nil {
 				c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("Mapping failed: %v", err)})
 				return
@@ -106,6 +115,18 @@ func uploadCSV(rule models.Rule) gin.HandlerFunc {
 			response = buildNestedMap(rule.Http.PayloadKey, payloads)
 		} else {
 			response = payloads
+		}
+
+		// Execute EXIT_RULE hook before HTTP operations
+		exitData := map[string]interface{}{
+			"rule_id":        rule.ID,
+			"processed_rows": processedRows,
+			"payloads":       payloads,
+		}
+
+		if _, err := pm.ExecuteHook(plugins.EXIT_RULE, exitData); err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("Plugin execution failed: %v", err)})
+			return
 		}
 
 		// start http stuff
@@ -124,6 +145,10 @@ func uploadCSV(rule models.Rule) gin.HandlerFunc {
 
 func main() {
 	godotenv.Load()
+	if err := godotenv.Load(); err != nil {
+		log.Printf("Error loading .env file: %v \n", err)
+	}
+
 	file, err := os.Open("config.yaml")
 	if err != nil {
 		log.Fatalf("Failed to open file: %v", err)
@@ -136,15 +161,25 @@ func main() {
 		log.Fatalf("Failed to decode YAML: %v", err)
 	}
 
-    // starting persistent handlers
-    for _, handler := range config.Handlers {
-        if !handler.Persistent {
-            continue
-        }
-        if _, err := handlers.NewProcess(handler.Name); err != nil {
-            log.Fatalf("%v", err)
-        }
-    }
+	// Initialize plugin manager
+	pm := plugins.NewPluginManager()
+
+	// Load plugins from config
+	for _, pluginPath := range config.Plugins {
+		if err := pm.LoadPlugin(pluginPath); err != nil {
+			log.Fatalf("Failed to load plugin %s: %v", pluginPath, err)
+		}
+	}
+
+	// starting persistent handlers
+	for _, handler := range config.Handlers {
+		if !handler.Persistent {
+			continue
+		}
+		if _, err := handlers.NewProcess(handler.Name); err != nil {
+			log.Fatalf("%v", err)
+		}
+	}
 
 	r := gin.Default()
 
@@ -152,7 +187,7 @@ func main() {
 	authGroup.Use(middlewares.AuthenticationMiddleware())
 
 	for _, rule := range config.Rules {
-		authGroup.POST(rule.ID, uploadCSV(rule))
+		authGroup.POST(rule.ID, uploadCSV(rule, pm))
 	}
 
 	log.Println("Datenkarte Started.")

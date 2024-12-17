@@ -32,3 +32,4 @@ config.yaml
 tmp/
 
 handlers/*
+plugins/*.so
